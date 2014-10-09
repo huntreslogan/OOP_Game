@@ -53,9 +53,13 @@ class Character(GameElement):
                     next_x = next_location[0]
                     next_y = next_location[1]
                     
+                    # if next_x > GAME_WIDTH -1 or next_x<0:
+                    #     self.board.draw_msg ("You can't go there")
+                    # elif next_y > GAME_HEIGHT -1 or next_y < 0:
+                    #     self.board.draw_msg("You can't go there")
+                    
                     existing_el = self.board.get_el(next_x, next_y)
-
-                    if existing_el and existing_el.SOLID:
+                    elif existing_el and existing_el.SOLID:
                         self.board.draw_msg("Get out of my way you punk!")
                     elif existing_el is None or not existing_el.SOLID:
                         self.board.del_el(self.x, self.y)

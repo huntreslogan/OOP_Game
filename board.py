@@ -19,8 +19,8 @@ class Board(object):
         self.height        = kwargs.get('height', 3)
         self.TILE_WIDTH    = kwargs.get('tile_width',  101)
         self.TILE_HEIGHT   = kwargs.get('tile_height', 171)
-        self.SCREEN_WIDTH  = kwargs.get('screen_width', 800)
-        self.SCREEN_HEIGHT = kwargs.get('screen_height', 600)
+        self.SCREEN_WIDTH  = kwargs.get('screen_width', 1000)
+        self.SCREEN_HEIGHT = kwargs.get('screen_height', 1000)
         self.IMAGES        = kwargs.get('images', {})
 
         # Screen center - half of board width
