@@ -101,7 +101,7 @@ class Enemy(GameElement):
     def update(self, dt):
         next_y = self.y + self.direction
 
-        if next_y < 0 or next_y >= self.board.height:
+        if next_y < 1 or next_y >= self.board.height - 1:
             self.direction *= -1
             next_y = self.y
         self.board.del_el(self.x, self.y)
