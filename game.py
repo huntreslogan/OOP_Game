@@ -9,8 +9,8 @@ GAME_BOARD = None
 DEBUG = False
 ######################
 
-GAME_WIDTH = 5
-GAME_HEIGHT = 5
+GAME_WIDTH = 7
+GAME_HEIGHT = 7
 
 class Rock(GameElement):
     IMAGE = "Rock"
@@ -20,6 +20,32 @@ class Gem(GameElement):
     IMAGE="BlueGem"
     SOLID = False
 
+class Door(GameElement):
+    IMAGE = "DoorClosed"
+    SOLID = True
+
+    def interact (self, player):
+        print ("This should worooork!")
+        if self.IMAGE=="DoorOpen":
+            self.SOLID=False
+        if self.IMAGE=="DoorClosed":
+            self.change_image("DoorOpen")
+
+class Wall(GameElement):
+    IMAGE = "TallWall"
+    SOLID = True
+
+class Chest(GameElement):
+    IMAGE="ChestClosed"
+    SOLID=True    
+
+    def interact(self, player):
+        print("interactiiiing!")
+        if self.IMAGE == "ChestOpen":
+            self.Solid = False
+        if self.IMAGE == "ChestClosed":
+            self.change_image("ChestOpen")
+        
 class Character(GameElement):
     IMAGE = "Princess"
     def next_pos(self, direction):
@@ -32,6 +58,7 @@ class Character(GameElement):
             elif direction == "right":
                 return (self.x+1, self.y)
             return None
+
 
     def keyboard_handler(self, symbol, modifier):
 
@@ -51,31 +78,42 @@ class Character(GameElement):
                 next_location = self.next_pos(direction)
                 if next_location:
                     next_x = next_location[0]
+            
+                
                     next_y = next_location[1]
-                    
-                    # if next_x > GAME_WIDTH -1 or next_x<0:
-                    #     self.board.draw_msg ("You can't go there")
-                    # elif next_y > GAME_HEIGHT -1 or next_y < 0:
-                    #     self.board.draw_msg("You can't go there")
-                    
+
                     existing_el = self.board.get_el(next_x, next_y)
-                    elif existing_el and existing_el.SOLID:
+                    if existing_el and existing_el.SOLID:
                         self.board.draw_msg("Get out of my way you punk!")
-                    elif existing_el is None or not existing_el.SOLID:
+                        existing_el.interact(self)
+                    
+                    if existing_el is None or not existing_el.SOLID:
                         self.board.del_el(self.x, self.y)
                         self.board.set_el(next_x, next_y, self)
 
 #### Put class definitions here ####
 
 ####   End class definitions    ####
+class Enemy(GameElement):
+    IMAGE= "Bug"
+    direction = 1
+
+    def update(self, dt):
+        next_y = self.y + self.direction
+
+        if next_y < 0 or next_y >= self.board.height:
+            self.direction *= -1
+            next_y = self.y
+        self.board.del_el(self.x, self.y)
+        self.board.set_el(self.x, next_y, self)
 
 def initialize():
     """Put game initialization code here"""
     #Initialize and register rock 1
     rock_positions = [
-            (2,1),
-            (1,2),
-            (3,2),
+            (2,2),
+            (1,3),
+            (2,4),
             (2,3),
     ]
     rocks=[]
@@ -92,7 +130,7 @@ def initialize():
 
     player=Character()
     GAME_BOARD.register(player)
-    GAME_BOARD.set_el(2,2,player)
+    GAME_BOARD.set_el(1,1,player)
     print player
 
     GAME_BOARD.draw_msg("This game is wicked awesome.")
@@ -100,3 +138,19 @@ def initialize():
     gem = Gem()
     GAME_BOARD.register(gem)
     GAME_BOARD.set_el(3,1, gem)
+
+    door = Door()
+    GAME_BOARD.register(door)
+    GAME_BOARD.set_el(4,4, door)
+
+    wall = Wall()
+    GAME_BOARD.register(wall)
+    GAME_BOARD.set_el(6,6,wall)
+
+    enemy = Enemy()
+    GAME_BOARD.register(enemy)
+    GAME_BOARD.set_el(3,3, enemy)
+
+    chest= Chest()
+    GAME_BOARD.register(chest)
+    GAME_BOARD.set_el(1,4,chest)
