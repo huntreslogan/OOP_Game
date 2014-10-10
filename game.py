@@ -23,21 +23,26 @@ class Gem(GameElement):
     def interact(self, player):
         
         player.inventory.append(self)
-        GAME_BOARD.draw_msg("You just aquired a gem! You have %d items!" %(len(player.inventory)))
+        print "added to inventory"
         print player.inventory
+        GAME_BOARD.draw_msg("You just aquired a gem! You have %d items!" %(len(player.inventory)))
+
 
 class OrangeGem(Gem):
     IMAGE="OrangeGem"
+
+    
 
 class Door(GameElement):
     IMAGE = "DoorClosed"
     SOLID = True
 
-    def interact (self, player):
-        if self.IMAGE=="DoorOpen":
-            self.SOLID=False
-        if self.IMAGE=="DoorClosed":
+    def interact(self, player):
+        keycount = player.inventory
+        if keycount >= 1:
+            self.SOLID = False
             self.change_image("DoorOpen")
+           
 
 class Wall(GameElement):
     IMAGE = "TallWall"
@@ -53,14 +58,34 @@ class Chest(GameElement):
     SOLID=True    
 
     def interact(self, player):
-        print("interactiiiing!")
-        if self.IMAGE == "ChestOpen":
-            self.Solid = False
-        if self.IMAGE == "ChestClosed":
+        keycount = player.inventory
+        if keycount >= 1:
+            self.SOLID = False
+            
             self.change_image("ChestOpen")
+
+class Key(GameElement):
+    IMAGE = "Key"
+
+    def interact(self, player):
+        player.inventory.append(self)
+        print "added to inventory"
+        print player.inventory
+        GAME_BOARD.draw_msg("You just aquired a key and have %d items! Maybe you should use it hmmmm?" %(len(player.inventory)))
+
         
+        keycount = 0 
+        for item in player.inventory:
+            if type(item) == Key:
+                keycount += 1
+            
+            print keycount
+            if keycount >= 1:
+                print keycount
+
+
 class Character(GameElement):
-    IMAGE = "Princess"
+    IMAGE = "HornGirl"
     
     def __init__(self):
         GameElement.__init__(self)
@@ -89,13 +114,14 @@ class Character(GameElement):
                     next_y = next_location[1]
 
                     existing_el = self.board.get_el(next_x, next_y)
-                    if existing_el and existing_el.SOLID:
+                    if existing_el:
                         self.board.draw_msg("Get out of my way you punk!")
                         existing_el.interact(self)
                     
                     if existing_el is None or not existing_el.SOLID:
                         self.board.del_el(self.x, self.y)
                         self.board.set_el(next_x, next_y, self)
+
     def next_pos(self, direction):
         if direction == "up":
             if self.y - 1 < 0:
@@ -127,7 +153,7 @@ class Character(GameElement):
 
 ####   End class definitions    ####
 class Enemy(GameElement):
-    IMAGE= "Bug"
+    IMAGE= "OrangeDragon"
     direction = 1
 
     def update(self, dt):
@@ -139,16 +165,48 @@ class Enemy(GameElement):
         self.board.del_el(self.x, self.y)
         self.board.set_el(self.x, next_y, self)
 
+class Tree(GameElement):
+    IMAGE = "TallTree"
+    SOLID = True
+
 def initialize():
     """Put game initialization code here"""
     #Initialize and register rock 1
     rock_positions = [
             (2,2),
-            (1,3),
+            (1,2),
             (2,4),
             (2,3),
     ]
     rocks=[]
+    water_pos= [
+            (0,0),
+            (1,0),
+            (2,0),
+            (3,0),
+            (4,0),
+            (5,0),
+            (6,0),
+            (1,6),
+            (2,6),
+            (3,6),
+            (4,6),
+            (5,6),
+            (0,2),
+            (0,3),
+            (0,4),
+            (0,5),
+            (6,2),
+            (6,3),
+            (6,4),
+            (6,5),   
+    ]
+    waters=[]
+    for pos in water_pos:
+        water = Water()
+        GAME_BOARD.register(water)
+        GAME_BOARD.set_el(pos[0],pos[1], water)
+        waters.append(water)
 
     for pos in rock_positions:
         rock = Rock()
@@ -167,9 +225,9 @@ def initialize():
 
     GAME_BOARD.draw_msg("This game is wicked awesome.")
 
-    gem = Gem()
+    gem = OrangeGem()
     GAME_BOARD.register(gem)
-    GAME_BOARD.set_el(4,1, gem)
+    GAME_BOARD.set_el(4,3, gem)
 
     door = Door()
     GAME_BOARD.register(door)
@@ -201,9 +259,20 @@ def initialize():
 
     gem = OrangeGem()
     GAME_BOARD.register(gem)
-    GAME_BOARD.set_el(1,5, gem)
+    GAME_BOARD.set_el(1,3, gem)
 
-    water = Water()
-    GAME_BOARD.register(water)
-    GAME_BOARD.set_el(1,0,water)
 
+    key_pos = [
+            (4,5),
+            (1,5),
+    ]
+    for pos in key_pos:
+        keys= []
+        key = Key()
+        GAME_BOARD.register(key)
+        GAME_BOARD.set_el(pos[0], pos[1], key)
+        keys.append(key) 
+
+    tree = Tree()
+    GAME_BOARD.register(tree)
+    GAME_BOARD.set_el(5,1, tree)
